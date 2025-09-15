@@ -116,6 +116,7 @@
         <a href="{{ route('productos.index') }}" class="btn-back">
             <button type="button" class="btn-back">Volver al listado</button>
         </a>
+        
     </div>
 
 </body>
