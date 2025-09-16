@@ -12,20 +12,26 @@ class VentaItem extends Model
     protected $table = 'venta_items';
 
     protected $fillable = [
-        'id_venta',
-        'id_producto',
+        'venta_id',
+        'producto_id',
         'cantidad',
         'precio_unitario',
         'subtotal',
     ];
 
+    /**
+     * Relación: cada ítem pertenece a una venta
+     */
     public function venta()
     {
-        return $this->belongsTo(\App\Models\Venta::class, 'id_venta', 'id');
+        return $this->belongsTo(\App\Models\Venta::class, 'venta_id', 'id');
     }
 
+    /**
+     * Relación: cada ítem corresponde a un producto
+     */
     public function producto()
     {
-        return $this->belongsTo(\App\Models\Producto::class, 'id_producto', 'id');
+        return $this->belongsTo(\App\Models\Producto::class, 'producto_id', 'id');
     }
 }
