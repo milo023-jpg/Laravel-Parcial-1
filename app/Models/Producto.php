@@ -9,22 +9,37 @@ class Producto extends Model
 {
     use HasFactory;
 
-    public $timestamps = false;
     protected $table = 'productos';
-    protected $primaryKey = 'id';
-    public $incrementing = true;
-    protected $keyType = 'int';
 
     protected $fillable = [
         'nombre',
-        'tipo_relleno',
+        'tipo',     // empanada o papa_rellena
         'tamaño',
-        'precio'
+        'precio',
     ];
 
-    // Relación: Un producto puede tener muchas ventas
+    // Relación: un producto aparece en muchos ítems de venta
+    public function items()
+    {
+        return $this->hasMany(\App\Models\VentaItem::class, 'id_producto', 'id');
+    }
+
+    // Relación indirecta: ventas donde aparece este producto
     public function ventas()
     {
-        return $this->hasMany(\App\Models\Venta::class, 'id_producto', 'id');
+        return $this->hasManyThrough(
+            \App\Models\Venta::class,       // modelo destino
+            \App\Models\VentaItem::class,   // tabla intermedia
+            'id_producto',                  // FK en venta_items
+            'id',                           // PK en ventas
+            'id',                           // PK en productos
+            'id_venta'                      // FK en venta_items hacia ventas
+        );
+    }
+
+    // Helper: saber si tiene ventas
+    public function tieneVentas()
+    {
+        return $this->items()->exists();
     }
 }
