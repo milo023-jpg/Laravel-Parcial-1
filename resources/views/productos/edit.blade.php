@@ -1,122 +1,38 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Producto</title>
+@extends('layouts.app')
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4; 
-            display: flex;
-            justify-content: center; 
-            align-items: flex-start;
-            padding-top: 50px;
-            margin: 0;
-        }
+@section('content')
+<div class="container">
+    <h1>Editar Producto</h1>
 
-        .container {
-            background-color: #fff; 
-            padding: 30px;
-            border-radius: 8px; 
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
-            width: 100%;
-            max-width: 500px;
-        }
+    <form action="{{ route('productos.update', $producto) }}" method="POST">
+        @csrf
+        @method('PUT')
 
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 25px;
-            border-bottom: 2px solid #007bff; 
-            padding-bottom: 10px;
-        }
+        <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input type="text" name="nombre" id="nombre" class="form-control" value="{{ old('nombre', $producto->nombre) }}" required>
+        </div>
 
-        label {
-            display: block;
-            margin-top: 10px;
-            margin-bottom: 5px;
-            color: #555;
-            font-weight: bold;
-        }
+        <div class="mb-3">
+            <label for="tipo" class="form-label">Tipo</label>
+            <select name="tipo" id="tipo" class="form-select" required>
+                <option value="empanada" {{ old('tipo', $producto->tipo)=='empanada' ? 'selected' : '' }}>Empanada</option>
+                <option value="papa_rellena" {{ old('tipo', $producto->tipo)=='papa_rellena' ? 'selected' : '' }}>Papa rellena</option>
+            </select>
+        </div>
 
-        input[type="text"],
-        input[type="number"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
+        <div class="mb-3">
+            <label for="tamaño" class="form-label">Tamaño</label>
+            <input type="text" name="tamaño" id="tamaño" class="form-control" value="{{ old('tamaño', $producto->tamaño) }}" required>
+        </div>
 
-        button {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 10px;
-            width: 100%;
-            transition: background-color 0.3s ease;
-        }
+        <div class="mb-3">
+            <label for="precio" class="form-label">Precio</label>
+            <input type="number" step="0.01" name="precio" id="precio" class="form-control" value="{{ old('precio', $producto->precio) }}" required>
+        </div>
 
-        button[type="submit"] {
-            background-color: #28a745;
-            color: white;
-        }
-
-        button[type="submit"]:hover {
-            background-color: #1e7e34;
-        }
-
-        .btn-back {
-            margin-top: 5px;
-                        width: 100%;
-
-            background-color: #007bff;
-            color: white;
-            text-align: center;
-            display: inline-block;
-            text-decoration: none;
-        }
-
-        .btn-back:hover {
-            background-color: #0056b3;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="container">
-        <h1>Editar Producto</h1>
-        
-        <form method="POST" action="{{ route('productos.update', $producto->codigo) }}">
-            @csrf 
-            @method('PUT')
-            
-            <label for="codigo">Código:</label>
-            <input type="text" id="codigo" name="codigo" value="{{ $producto->codigo }}" readonly>
-            
-            <label for="nombre">Nombre:</label>
-            <input type="text" id="nombre" name="nombre" value="{{ $producto->nombre }}" required>
-            
-            <label for="cantidad">Cantidad:</label>
-            <input type="number" id="cantidad" name="cantidad" value="{{ $producto->cantidad }}" required>
-
-            <label for="precio">Precio:</label>
-            <input type="number" id="precio" name="precio" value="{{ $producto->precio }}" step="0.01" required>
-
-            
-            <button type="submit">Actualizar</button>
-        </form>
-
-        <!-- Botón para volver al Index -->
-        <a href="{{ route('productos.index') }}" class="btn-back">
-            <button type="button" class="btn-back">Volver al listado</button>
-        </a>
-    </div>
-
-</body>
-</html>
+        <button type="submit" class="btn btn-success">Actualizar</button>
+        <a href="{{ route('productos.index') }}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+@endsection
