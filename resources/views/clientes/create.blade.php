@@ -1,112 +1,96 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nuevo Producto</title>
+@extends('layouts.app')
 
+@section('content')
     <style>
         /* Estilos básicos para el cuerpo y el formulario */
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4; /* Fondo gris claro */
+            background-color: #f4f4f4;
             display: flex;
-            flex-direction: column; /* Apila los elementos verticalmente */
-            justify-content: center; /* Centra el contenido horizontalmente */
-            align-items: center; /* Centra el contenido horizontalmente */
+            flex-direction: column;
+            align-items: center;
             padding-top: 50px;
             margin: 0;
         }
 
         form {
-            background-color: #fff; /* Fondo blanco para el formulario */
+            background-color: #fff;
             padding: 30px;
-            border-radius: 8px; /* Bordes redondeados */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 450px; /* Ancho máximo para que no se estire demasiado */
-            margin-top: 25px; /* Añade un poco de espacio entre el h1 y el formulario */
+            max-width: 450px;
+            margin-top: 25px;
         }
 
-        /* Estilo del título */
         h1 {
             text-align: center;
             color: #333;
             margin-bottom: 25px;
-            border-bottom: 2px solid #007bff; /* Línea de color azul bajo el título */
+            border-bottom: 2px solid #007bff;
             padding-bottom: 10px;
         }
 
-        /* Estilo para los campos de texto y número */
         input[type="text"],
-        input[type="number"] {
+        input[type="number"],
+        select,
+        textarea {
             width: 100%;
             padding: 10px;
-            margin-bottom: 15px; /* Espacio debajo de cada campo */
+            margin-bottom: 15px;
             border: 1px solid #ccc;
             border-radius: 4px;
-            box-sizing: border-box; /* Importante para que el padding no cambie el ancho total */
+            box-sizing: border-box;
         }
 
-        /* Estilo para las etiquetas (labels) */
         label {
-            display: block; /* Ocupa toda la línea */
+            display: block;
             margin-top: 10px;
             margin-bottom: 5px;
             color: #555;
             font-weight: bold;
         }
-        
-        /* Contenedor para los botones para que estén en la misma fila */
+
         .button-container {
             display: flex;
-            justify-content: space-around; /* Cambiado a 'space-around' para separar los botones */
+            justify-content: space-around;
             margin-top: 20px;
         }
 
-        /* Estilo para los botones */
         .form-button {
             padding: 12px 20px;
-            gap:5px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
-            width: 31%; /* Ajusta el ancho para tres botones */
+            width: 31%;
             text-align: center;
             text-decoration: none;
-            display: inline-block;
-            transition: background-color 0.3s ease; /* Transición suave */
+            transition: background-color 0.3s ease;
         }
 
-        /* Estilo para el botón de "Guardar" */
         .save-button {
-            background-color: #007bff; /* Fondo azul */
+            background-color: #007bff;
             color: white;
         }
-
         .save-button:hover {
-            background-color: #0056b3; /* Azul más oscuro al pasar el ratón */
+            background-color: #0056b3;
         }
 
-        /* Estilo para el botón de "Atrás" */
         .back-button {
-            background-color: #6c757d; /* Fondo gris para el botón de atrás */
+            background-color: #6c757d;
             color: white;
         }
-
         .back-button:hover {
-            background-color: #5a6268; /* Gris más oscuro al pasar el ratón */
+            background-color: #5a6268;
         }
 
-        /* Estilo para el nuevo botón "Cancelar" */
         .cancel-button {
-            background-color: #dc3545; /* Fondo rojo */
+            background-color: #dc3545;
             color: white;
         }
-
         .cancel-button:hover {
-            background-color: #c82333; /* Rojo más oscuro al pasar el ratón */
+            background-color: #c82333;
         }
 
         .error-message {
@@ -130,39 +114,65 @@
         }
     </style>
 
+    <h1>Registrar Cliente</h1>
 
-</head>
-<body>
-
-    <h1>Nuevo Producto</h1>
-    @if($errors->any())
+    {{-- Mensajes de error --}}
+    @if ($errors->any())
         <div class="error-message">
-            @foreach($errors->all() as $error)
-                {{ $error }}
-            @endforeach
+            <strong>Ups!</strong> Hay algunos problemas con tus datos.<br><br>
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
     @endif
-    <form method="POST" action="{{ route('productos.store') }}">
+
+    {{-- Mensaje de éxito --}}
+    @if(session('success'))
+        <div class="success-message">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    {{-- Formulario --}}
+    <form action="{{ route('clientes.store') }}" method="POST">
         @csrf
-        <label for="codigo">Código:</label>
-        <input type="text" id="codigo" name="codigo" placeholder="Código" required>
-        
-        <label for="nombre">Nombre:</label>
-        <input type="text" id="nombre" name="nombre" placeholder="Nombre" required>
-        
-        <label for="cantidad">Cantidad:</label>
-        <input type="number" id="cantidad" name="cantidad" placeholder="Cantidad" required>
-        
-        <label for="precio">Precio:</label>
-        <input type="number" id="precio" name="precio" placeholder="Precio" step="0.01" required>
-        
-        <label for="descripcion">descripcion:</label>
-        <input type="text" id="descripcion" name="descripcion" placeholder="Descripción" required>
+
+        <label for="nombre">Nombre *</label>
+        <input type="text" name="nombre" value="{{ old('nombre') }}" required>
+
+        <label for="ciudad">Ciudad</label>
+        <input type="text" name="ciudad" value="{{ old('ciudad') }}">
+
+        <label for="tipo_documento">Tipo de Documento *</label>
+        <select name="tipo_documento" required>
+            <option value="">Seleccione...</option>
+            <option value="CC" {{ old('tipo_documento') == 'CC' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
+            <option value="TI" {{ old('tipo_documento') == 'TI' ? 'selected' : '' }}>Tarjeta de Identidad</option>
+            <option value="CE" {{ old('tipo_documento') == 'CE' ? 'selected' : '' }}>Cédula de Extranjería</option>
+            <option value="NIT" {{ old('tipo_documento') == 'NIT' ? 'selected' : '' }}>NIT</option>
+            <option value="PASAPORTE" {{ old('tipo_documento') == 'PASAPORTE' ? 'selected' : '' }}>Pasaporte</option>
+        </select>
+
+        <label for="numero_documento">Número de Documento *</label>
+        <input type="text" name="numero_documento" value="{{ old('numero_documento') }}" required>
+
+        <label for="telefono">Teléfono</label>
+        <input type="text" name="telefono" value="{{ old('telefono') }}">
+
+        <label for="direccion">Dirección</label>
+        <textarea name="direccion">{{ old('direccion') }}</textarea>
+
+        <label>
+            <input type="checkbox" name="frecuente" value="1" {{ old('frecuente') ? 'checked' : '' }}>
+            Cliente frecuente
+        </label>
 
         <div class="button-container">
-            <a href="{{ route('productos.index') }}" class="form-button back-button">Atrás</a>
+            <a href="{{ route('clientes.index') }}" class="form-button back-button">Atrás</a>
+            <button type="reset" class="form-button cancel-button">Cancelar</button>
             <button type="submit" class="form-button save-button">Guardar</button>
         </div>
     </form>
-</body>
-</html>
+@endsection
