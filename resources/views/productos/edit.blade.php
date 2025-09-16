@@ -15,7 +15,7 @@
             padding-top: 50px;
             margin: 0;
         }
-
+        
         .container {
             background-color: #fff; 
             padding: 30px;
