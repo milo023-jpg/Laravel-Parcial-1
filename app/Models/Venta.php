@@ -42,7 +42,7 @@ class Venta extends Model
         return $this->hasManyThrough(
             \App\Models\Producto::class,    // modelo destino
             \App\Models\VentaItem::class,   // tabla intermedia
-            'id_venta',                     // FK en venta_items hacia ventas
+            'venta_id',                     // FK en venta_items hacia ventas
             'id',                           // PK en productos
             'id',                           // PK en ventas
             'id_producto'                   // FK en venta_items hacia productos

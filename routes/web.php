@@ -64,12 +64,8 @@ Route::delete('/ventas/{venta}', [VentaController::class, 'destroy'])->name('ven
 
 
 // Rutas para las vistas Blade de Punto de Venta (POS)
+// Rutas del Punto de Venta (POS) - versión simplificada
 Route::get('/pos', [VentaController::class, 'create'])->name('pos');
-Route::post('/pos/venta', [VentaController::class, 'storeWeb']);
-Route::get('/pos/productos/buscar', [VentaController::class, 'buscarProductos']);
-Route::get('/pos/clientes', [VentaController::class, 'obtenerClientes']);
-Route::post('/pos/clientes', [VentaController::class, 'crearCliente']);
-Route::get('/pos/productos/puede-eliminar/{id}', [VentaController::class, 'puedeEliminarProducto']);
-Route::get('/productos/buscar', [App\Http\Controllers\VentaController::class, 'buscarProductos'])->name('productos.buscar');
-
+Route::post('/pos/venta', [VentaController::class, 'store'])->name('pos.venta.store');
+Route::post('/pos/cliente', [VentaController::class, 'storeCliente'])->name('pos.cliente.store');
 

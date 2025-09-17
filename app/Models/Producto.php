@@ -33,7 +33,7 @@ class Producto extends Model
             'producto_id',                  // FK en venta_items
             'id',                           // PK en ventas
             'id',                           // PK en productos
-            'id_venta'                      // FK en venta_items hacia ventas
+            'venta_id'                      // FK en venta_items hacia ventas
 
 
         );
