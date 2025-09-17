@@ -20,6 +20,7 @@ Route::get('/', function () {
 
 // Ruta del panel de administrador
 Route::prefix('admin')->name('admin.')->group(function () {
+<<<<<<< HEAD
     Route::get('/', function () {
         return view('admin');   // <-- ahora renderiza admin.blade.php
     })->name('index');
@@ -42,7 +43,34 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // Informe de ventas (provisional)
     Route::get('/ventas', [VentaController::class, 'index'])->name('ventas.index');
+=======
+// Gestión de Clientes
+Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
+Route::get('/clientes/create', [ClienteController::class, 'create'])->name('clientes.create');
+Route::post('/clientes', [ClienteController::class, 'store'])->name('clientes.store');
+Route::get('/clientes/{cliente}/edit', [ClienteController::class, 'edit'])->name('clientes.edit');
+Route::put('/clientes/{cliente}', [ClienteController::class, 'update'])->name('clientes.update');
+Route::delete('/clientes/{cliente}', [ClienteController::class, 'destroy'])->name('clientes.destroy');
+
+// Gestión de Ventas
+Route::get('/ventas', [VentaController::class, 'vistaIndex'])->name('ventas.index');
+Route::get('/ventas/create', [VentaController::class, 'create'])->name('ventas.create');
+Route::post('/ventas', [VentaController::class, 'storeWeb'])->name('ventas.store');
+Route::get('/ventas/{venta}', [VentaController::class, 'vistaShow'])->name('ventas.show');
+Route::get('/ventas/{venta}/edit', [VentaController::class, 'edit'])->name('ventas.edit');
+Route::put('/ventas/{venta}', [VentaController::class, 'update'])->name('ventas.update');
+Route::delete('/ventas/{venta}', [VentaController::class, 'destroy'])->name('ventas.destroy');
+
+>>>>>>> e654e318ff18105ac4993ca96018dcb9121456d0
 });
 
+
+// Rutas para las vistas Blade de Punto de Venta (POS)
 Route::get('/pos', [VentaController::class, 'create'])->name('pos');
+Route::post('/pos/venta', [VentaController::class, 'storeWeb']);
+Route::get('/pos/productos/buscar', [VentaController::class, 'buscarProductos']);
+Route::get('/pos/clientes', [VentaController::class, 'obtenerClientes']);
+Route::post('/pos/clientes', [VentaController::class, 'crearCliente']);
+Route::get('/pos/productos/puede-eliminar/{id}', [VentaController::class, 'puedeEliminarProducto']);
+
 
