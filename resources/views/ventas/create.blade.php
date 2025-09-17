@@ -41,15 +41,19 @@
                     <div class="card-body">
                         <div class="mb-3">
                             <label for="cliente_id" class="form-label">Cliente (Opcional)</label>
-                            <select name="cliente_id" id="cliente_id" class="form-select">
-                                <option value="">Seleccionar cliente...</option>
-                                @foreach($clientes as $cliente)
-                                    <option value="{{ $cliente->id }}" {{ old('cliente_id') == $cliente->id ? 'selected' : '' }}>
-                                        {{ $cliente->nombre }} - {{ $cliente->numero_documento }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <small class="text-muted">Deja en blanco para venta sin cliente registrado</small>
+                            <div class="d-flex gap-2">
+                                <select name="cliente_id" id="cliente_id" class="form-select">
+                                    <option value="">Cliente Mostrador</option>
+                                    @foreach($clientes as $cliente)
+                                        <option value="{{ $cliente->id }}" {{ old('cliente_id') == $cliente->id ? 'selected' : '' }}>
+                                            {{ $cliente->nombre }} - {{ $cliente->numero_documento }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNuevoCliente">
+                                    Nuevo Cliente
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -139,6 +143,70 @@
         </div>
     </form>
 
+</div>
+
+{{-- Modal Nuevo Cliente --}}
+<div class="modal fade" id="modalNuevoCliente" tabindex="-1" aria-labelledby="modalNuevoClienteLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalNuevoClienteLabel">Registrar Cliente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formNuevoCliente">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="modal_nombre" class="form-label">Nombre <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="modal_nombre" name="nombre" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="modal_tipo_documento" class="form-label">Tipo de Documento <span class="text-danger">*</span></label>
+                        <select class="form-select" id="modal_tipo_documento" name="tipo_documento" required>
+                            <option value="">Seleccione...</option>
+                            <option value="CC">CC</option>
+                            <option value="TI">TI</option>
+                            <option value="CE">CE</option>
+                            <option value="NIT">NIT</option>
+                            <option value="PASAPORTE">PASAPORTE</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="modal_numero_documento" class="form-label">Número de Documento <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="modal_numero_documento" name="numero_documento" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="modal_telefono" class="form-label">Teléfono</label>
+                        <input type="text" class="form-control" id="modal_telefono" name="telefono">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="modal_direccion" class="form-label">Dirección</label>
+                        <textarea class="form-control" id="modal_direccion" name="direccion" rows="2"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="modal_ciudad" class="form-label">Ciudad</label>
+                        <input type="text" class="form-control" id="modal_ciudad" name="ciudad">
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="modal_frecuente" name="frecuente" value="1">
+                        <label class="form-check-label" for="modal_frecuente">
+                            Cliente frecuente
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -244,6 +312,61 @@ document.addEventListener('DOMContentLoaded', function() {
             cambioSpan.style.color = 'green';
         }
     }
+
+    // Manejo del formulario de nuevo cliente
+    document.getElementById('formNuevoCliente').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        fetch('{{ route("admin.clientes.store") }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Cerrar modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('modalNuevoCliente'));
+                modal.hide();
+                
+                // Limpiar formulario
+                document.getElementById('formNuevoCliente').reset();
+                
+                // Agregar cliente al select
+                const clienteSelect = document.getElementById('cliente_id');
+                const option = document.createElement('option');
+                option.value = data.cliente.id;
+                option.textContent = data.cliente.nombre + ' - ' + data.cliente.numero_documento;
+                option.selected = true;
+                clienteSelect.appendChild(option);
+                
+                // Mostrar mensaje de éxito
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                alertDiv.innerHTML = `
+                    ${data.message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.querySelector('.container').insertBefore(alertDiv, document.querySelector('form'));
+            } else {
+                alert('Error al crear el cliente: ' + (data.message || 'Error desconocido'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al crear el cliente');
+        });
+    });
 });
 </script>
+
+{{-- Asegurar que Bootstrap JS esté disponible --}}
+@if(!isset($bootstrapLoaded))
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+@endif
+
 @endsection

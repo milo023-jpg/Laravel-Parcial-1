@@ -39,7 +39,16 @@ class ClienteController extends Controller
             'frecuente'        => 'boolean',
         ]);
 
-        Cliente::create($request->all());
+        $cliente = Cliente::create($request->all());
+
+        // Si es una petición AJAX, devolver JSON
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Cliente creado correctamente.',
+                'cliente' => $cliente
+            ]);
+        }
 
         return redirect()->route('admin.clientes.index')
                          ->with('success', 'Cliente creado correctamente.');
