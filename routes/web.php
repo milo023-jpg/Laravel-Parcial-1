@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Route;
 
 // CRUD
 
-//use App\Http\Controllers\PedidoController;
 //use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\VentaController;
