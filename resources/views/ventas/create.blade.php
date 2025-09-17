@@ -5,10 +5,6 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="mb-0">Nueva Venta</h1>
-        <div class="d-flex gap-2">
-            <a href="{{ route('admin.ventas.index') }}" class="btn btn-secondary">⬅️ Volver a Ventas</a>
-            <a href="{{ route('menu') }}" class="btn btn-outline-secondary">🏠 Menú Principal</a>
-        </div>
     </div>
 
     {{-- Mensajes --}}
@@ -28,7 +24,7 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.ventas.store') }}" method="POST" id="formVenta">
+    <form action="/pos/venta" method="POST" id="formVenta">
         @csrf
         
         <div class="row">
@@ -138,9 +134,10 @@
         </div>
 
         <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-success">💾 Registrar Venta</button>
-            <a href="{{ route('admin.ventas.index') }}" class="btn btn-secondary">❌ Cancelar</a>
+            <button type="button" id="btnRegistrar" class="btn btn-success">💾 Registrar Venta</button>
+            <button type="button" id="btnCancelar" class="btn btn-secondary">❌ Cancelar</button>
         </div>
+
     </form>
 
 </div>
@@ -209,17 +206,22 @@
     </div>
 </div>
 
+{{-- jQuery + jQuery UI para autocomplete --}}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    let contadorProductos = 0;
-    const productos = @json($productos);
-    
-    // Agregar primer producto automáticamente
-    agregarProducto();
-    
-    document.getElementById('agregar-producto').addEventListener('click', agregarProducto);
-    
-    function agregarProducto() {
+    document.addEventListener('DOMContentLoaded', function() {
+        let contadorProductos = 0;
+        const productos = @json($productos);
+        
+        // Agregar primer producto automáticamente
+        agregarProducto();
+        
+        document.getElementById('agregar-producto').addEventListener('click', agregarProducto);
+        
+        function agregarProducto() {
         contadorProductos++;
         
         const container = document.getElementById('productos-container');
@@ -230,14 +232,18 @@ document.addEventListener('DOMContentLoaded', function() {
         productoDiv.innerHTML = `
             <div class="col-md-4">
                 <label class="form-label">Producto *</label>
-                <select name="productos[${contadorProductos}][id]" class="form-select producto-select" required>
-                    <option value="">Seleccionar producto...</option>
-                    ${productos.map(p => `<option value="${p.id}" data-precio="${p.precio}">${p.nombre} - $${p.precio.toLocaleString()}</option>`).join('')}
-                </select>
+                <input type="text" 
+                    id="buscar-producto-${contadorProductos}" 
+                    class="form-control buscar-producto" 
+                    placeholder="Buscar producto..." required>
+                <input type="hidden" 
+                    name="productos[${contadorProductos}][id]" 
+                    id="producto-id-${contadorProductos}" required>
             </div>
             <div class="col-md-3">
                 <label class="form-label">Cantidad *</label>
-                <input type="number" name="productos[${contadorProductos}][cantidad]" class="form-control cantidad-input" min="1" value="1" required>
+                <input type="number" name="productos[${contadorProductos}][cantidad]" 
+                    class="form-control cantidad-input" min="1" value="1" required>
             </div>
             <div class="col-md-3">
                 <label class="form-label">Subtotal</label>
@@ -253,12 +259,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
         container.appendChild(productoDiv);
         
-        // Eventos para el nuevo producto
-        const select = productoDiv.querySelector('.producto-select');
+        // Eventos
         const cantidadInput = productoDiv.querySelector('.cantidad-input');
         const eliminarBtn = productoDiv.querySelector('.eliminar-producto');
-        
-        select.addEventListener('change', calcularTotales);
+
         cantidadInput.addEventListener('input', calcularTotales);
         eliminarBtn.addEventListener('click', function() {
             if (document.querySelectorAll('.producto-row').length > 1) {
@@ -268,7 +272,40 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Debe haber al menos un producto en la venta');
             }
         });
+
+        // Autocomplete con jQuery UI
+        $(`#buscar-producto-${contadorProductos}`).autocomplete({
+            source: function(request, response) {
+                $.ajax({
+                    url: "/productos/buscar", // tu ruta en web.php
+                    data: { term: request.term },
+                    success: function(data) {
+                        response($.map(data, function(item) {
+                            return {
+                                label: item.nombre + " - $" + item.precio,
+                                value: item.nombre,
+                                id: item.id,
+                                precio: item.precio
+                            };
+                        }));
+                    }
+                });
+            },
+            select: function(event, ui) {
+                // Guardar el ID en el hidden input
+                $(`#producto-id-${contadorProductos}`).val(ui.item.id);
+                $(`#producto-id-${contadorProductos}`).attr('data-precio', ui.item.precio);
+
+                // Actualizar subtotal inicial
+                const cantidad = cantidadInput.value || 1;
+                const subtotalInput = productoDiv.querySelector('.subtotal-display');
+                subtotalInput.value = (ui.item.precio * cantidad).toLocaleString();
+
+                calcularTotales();
+            }
+        });
     }
+
     
     // Eventos para descuento y pago
     document.getElementById('descuento').addEventListener('input', calcularTotales);
@@ -278,15 +315,15 @@ document.addEventListener('DOMContentLoaded', function() {
         let subtotal = 0;
         
         document.querySelectorAll('.producto-row').forEach(row => {
-            const select = row.querySelector('.producto-select');
+            const hiddenId = row.querySelector('input[type="hidden"]');
             const cantidadInput = row.querySelector('.cantidad-input');
             const subtotalDisplay = row.querySelector('.subtotal-display');
-            
-            if (select.value && cantidadInput.value) {
-                const precio = parseFloat(select.selectedOptions[0].dataset.precio) || 0;
-                const cantidad = parseInt(cantidadInput.value) || 0;
+
+            const precio = parseFloat(hiddenId.dataset.precio || 0);
+            const cantidad = parseInt(cantidadInput.value) || 0;
+
+            if (hiddenId.value && cantidad > 0) {
                 const subtotalProducto = precio * cantidad;
-                
                 subtotalDisplay.value = '$' + subtotalProducto.toLocaleString();
                 subtotal += subtotalProducto;
             } else {
@@ -313,13 +350,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+
     // Manejo del formulario de nuevo cliente
     document.getElementById('formNuevoCliente').addEventListener('submit', function(e) {
         e.preventDefault();
         
         const formData = new FormData(this);
         
-        fetch('{{ route("admin.clientes.store") }}', {
+        fetch('/pos/clientes', {
             method: 'POST',
             body: formData,
             headers: {
@@ -361,12 +399,111 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Error al crear el cliente');
         });
     });
+
+    // Registrar venta con AJAX (moved inside DOMContentLoaded)
+    document.getElementById('btnRegistrar').addEventListener('click', function() {
+        const form = document.getElementById('formVenta');
+        
+        // Construir datos manualmente para que coincidan con la validación
+        const formData = new FormData();
+        
+        // Agregar CSRF token
+        formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+        
+        // Agregar cliente_id
+        const clienteId = document.getElementById('cliente_id').value;
+        if (clienteId) {
+            formData.append('cliente_id', clienteId);
+        }
+        
+        // Agregar descuento y pago
+        formData.append('descuento', document.getElementById('descuento').value || 0);
+        formData.append('pago', document.getElementById('pago').value);
+        
+        // Validar que haya productos válidos
+        const productosRows = document.querySelectorAll('.producto-row');
+        let hayProductosValidos = false;
+        
+        productosRows.forEach((row, index) => {
+            const productoId = row.querySelector('input[type="hidden"]').value;
+            const cantidad = row.querySelector('.cantidad-input').value;
+            
+            if (productoId && cantidad) {
+                formData.append(`productos[${index}][id]`, productoId);
+                formData.append(`productos[${index}][cantidad]`, cantidad);
+                hayProductosValidos = true;
+            }
+        });
+
+        if (!hayProductosValidos) {
+            alert('Debe seleccionar al menos un producto válido');
+            return;
+        }
+
+        fetch("/pos/venta", {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    throw new Error('Server error: ' + response.status + ' - ' + text);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Response data:', data);
+            if (data.success) {
+                // Limpiar formulario
+                form.reset();
+
+                // Limpiar productos dinámicos y volver a crear uno vacío
+                document.getElementById('productos-container').innerHTML = '';
+                contadorProductos = 0;
+                agregarProducto();
+
+                // Reset totales
+                document.getElementById('subtotal').textContent = '0';
+                document.getElementById('descuento-display').textContent = '0';
+                document.getElementById('total').textContent = '0';
+                document.getElementById('cambio').textContent = '0';
+
+                // Mostrar alerta de éxito
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                alertDiv.innerHTML = `
+                    ${data.message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.querySelector('.container').insertBefore(alertDiv, form);
+            } else {
+                alert('Error al registrar la venta: ' + (data.message || 'Error desconocido'));
+            }
+        })
+        .catch(error => {
+            console.error('Full error:', error);
+            alert('Error completo: ' + error.message);
+        });
+    });
+
+    // 🔥 Cancelar venta (moved inside DOMContentLoaded)
+    document.getElementById('btnCancelar').addEventListener('click', function() {
+        const form = document.getElementById('formVenta');
+        form.reset();
+
+        // Limpiar productos dinámicos y volver a crear uno vacío
+        document.getElementById('productos-container').innerHTML = '';
+        contadorProductos = 0;
+        agregarProducto();
+
+        // Reset totales
+        document.getElementById('subtotal').textContent = '0';
+        document.getElementById('descuento-display').textContent = '0';
+        document.getElementById('total').textContent = '0';
+        document.getElementById('cambio').textContent = '0';
+    });
+
 });
 </script>
-
-{{-- Asegurar que Bootstrap JS esté disponible --}}
-@if(!isset($bootstrapLoaded))
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-@endif
-
 @endsection

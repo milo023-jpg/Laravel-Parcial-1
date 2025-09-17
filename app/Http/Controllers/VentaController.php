@@ -26,24 +26,36 @@ class VentaController extends Controller
     public function store(Request $request)
     {
         try {
+            // 🔹 Validar datos de la venta
+            $request->validate([
+                'cliente_id'             => 'nullable|exists:clientes,id',
+                'descuento'              => 'nullable|numeric|min:0',
+                'valor_total'            => 'required|numeric|min:0',
+                'items'                  => 'required|array|min:1', // debe haber al menos 1 item
+                'items.*.producto_id'    => 'required|exists:productos,id',
+                'items.*.cantidad'       => 'required|integer|min:1',
+                'items.*.precio_unitario'=> 'required|numeric|min:0',
+                'items.*.subtotal'       => 'required|numeric|min:0',
+            ]);
+
             DB::beginTransaction();
 
             // Crear la venta
             $venta = Venta::create([
-                'cliente_id' => $request->cliente_id,
-                'descuento' => $request->descuento ?? 0,
-                'valor_total' => $request->valor_total,
-                'fecha_venta' => now()
+                'cliente_id'   => $request->cliente_id,
+                'descuento'    => $request->descuento ?? 0,
+                'valor_total'  => $request->valor_total,
+                'fecha_venta'  => now()
             ]);
 
             // Crear los ítems de la venta
             foreach ($request->items as $item) {
                 VentaItem::create([
-                    'venta_id' => $venta->id,
-                    'producto_id' => $item['producto_id'],
-                    'cantidad' => $item['cantidad'],
+                    'venta_id'        => $venta->id,
+                    'producto_id'     => $item['producto_id'],
+                    'cantidad'        => $item['cantidad'],
                     'precio_unitario' => $item['precio_unitario'],
-                    'subtotal' => $item['subtotal']
+                    'subtotal'        => $item['subtotal']
                 ]);
             }
 
@@ -51,17 +63,28 @@ class VentaController extends Controller
 
             return response()->json([
                 'success' => true,
-                'venta' => $venta->load('items.producto', 'cliente')
+                'message' => 'Venta registrada correctamente ✅',
+                'venta'   => $venta->load('items.producto', 'cliente')
             ], 201);
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Si la validación falla, devolvemos errores
+            return response()->json([
+                'success' => false,
+                'message' => 'Error de validación',
+                'errors'  => $e->errors()
+            ], 422);
+
         } catch (\Exception $e) {
-            DB::rollback();
+            DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'Error al procesar la venta: ' . $e->getMessage()
             ], 500);
         }
     }
+
+
 
     // Muestra una venta específica
     public function show($id)
@@ -73,12 +96,8 @@ class VentaController extends Controller
     // Buscar productos para el autocompletado
     public function buscarProductos(Request $request)
     {
-        $term = $request->get('q', '');
-        
-        $productos = Producto::where('nombre', 'LIKE', "%{$term}%")
-            ->select('id', 'nombre', 'tipo', 'tamaño', 'precio')
-            ->limit(10)
-            ->get();
+        $term = $request->get('term');
+        $productos = Producto::where('nombre', 'LIKE', "%$term%")->get();
 
         return response()->json($productos);
     }
@@ -212,9 +231,18 @@ class VentaController extends Controller
 
             DB::commit();
 
+            // Si es una petición AJAX, devolver JSON
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => "Venta #{$venta->id} registrada correctamente. Cambio: $" . number_format($request->pago - $valorTotal, 0, ',', '.'),
+                    'venta' => $venta->load('items.producto', 'cliente')
+                ]);
+            }
+
             return redirect()->route('ventas.index')
                 ->with('success', "Venta #{$venta->id} registrada correctamente. Cambio: $" . number_format($request->pago - $valorTotal, 2));
-
+                
         } catch (\Exception $e) {
             DB::rollback();
             return back()->withInput()

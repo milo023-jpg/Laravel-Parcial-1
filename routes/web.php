@@ -70,5 +70,6 @@ Route::get('/pos/productos/buscar', [VentaController::class, 'buscarProductos'])
 Route::get('/pos/clientes', [VentaController::class, 'obtenerClientes']);
 Route::post('/pos/clientes', [VentaController::class, 'crearCliente']);
 Route::get('/pos/productos/puede-eliminar/{id}', [VentaController::class, 'puedeEliminarProducto']);
+Route::get('/productos/buscar', [App\Http\Controllers\VentaController::class, 'buscarProductos'])->name('productos.buscar');
 
 
