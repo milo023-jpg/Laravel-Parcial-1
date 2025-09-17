@@ -73,12 +73,12 @@
             Gestionar Productos
         </a>
         
-        <a href="{{ route('clientes.index') }}" class="menu-option">
+        <a href="{{ route('admin.clientes.index') }}" class="menu-option">
             Gestionar Clientes
         </a>
         
-        <a href="{{ route('pedidos.index') }}" class="menu-option">
-            Gestionar Pedidos
+        <a href="{{ route('Venta.index') }}" class="menu-option">
+            Gestionar Ventas
         </a>
     </div>
 </body>
