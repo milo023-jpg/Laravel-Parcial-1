@@ -9,7 +9,7 @@ use App\Models\Cliente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class VentasController extends Controller
+class VentaController extends Controller
 {
     // ================= API (JSON) =================
 

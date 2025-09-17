@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 //use App\Http\Controllers\PedidoController;
 //use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\VentaController;
 
 // Rutas principales
 Route::get('/', function () {
@@ -40,6 +41,8 @@ Route::get('/clientes/{cliente}/edit', [ClienteController::class, 'edit'])->name
 Route::put('/clientes/{cliente}', [ClienteController::class, 'update'])->name('clientes.update');
 Route::delete('/clientes/{cliente}', [ClienteController::class, 'destroy'])->name('clientes.destroy');
 });
+
+Route::get('/pos', [VentaController::class, 'create'])->name('pos');
 
 // Rutas para las vistas Blade de Pedidos (pedidos)
 //Route::get('/pedidos', [PedidoController::class, 'vistaIndex'])->name('pedidos.index');
