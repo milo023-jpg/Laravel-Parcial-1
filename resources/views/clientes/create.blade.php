@@ -1,149 +1,33 @@
 @extends('layouts.app')
 
 @section('content')
-    <style>
-        /* Estilos básicos para el cuerpo y el formulario */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 50px;
-            margin: 0;
-        }
-
-        form {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 450px;
-            margin-top: 25px;
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 25px;
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 10px;
-        }
-
-        input[type="text"],
-        input[type="number"],
-        select,
-        textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        label {
-            display: block;
-            margin-top: 10px;
-            margin-bottom: 5px;
-            color: #555;
-            font-weight: bold;
-        }
-
-        .button-container {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 20px;
-        }
-
-        .form-button {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            width: 31%;
-            text-align: center;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
-        }
-
-        .save-button {
-            background-color: #007bff;
-            color: white;
-        }
-        .save-button:hover {
-            background-color: #0056b3;
-        }
-
-        .back-button {
-            background-color: #6c757d;
-            color: white;
-        }
-        .back-button:hover {
-            background-color: #5a6268;
-        }
-
-        .cancel-button {
-            background-color: #dc3545;
-            color: white;
-        }
-        .cancel-button:hover {
-            background-color: #c82333;
-        }
-
-        .error-message {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #f5c6cb;
-            border-radius: 5px;
-            max-width: 450px;
-        }
-
-        .success-message {
-            background-color: #d4edda;
-            color: #155724;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #c3e6cb;
-            border-radius: 5px;
-            max-width: 450px;
-        }
-    </style>
-
-    <h1>Registrar Cliente</h1>
-
-    {{-- Mensajes de error --}}
-    @if ($errors->any())
-        <div class="error-message">
-            <strong>Ups!</strong> Hay algunos problemas con tus datos.<br><br>
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    {{-- Mensaje de éxito --}}
-    @if(session('success'))
-        <div class="success-message">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    {{-- Formulario --}}
-    <form action="{{ route('clientes.store') }}" method="POST">
+    <form action="{{ route('admin.clientes.store') }}" method="POST" class="p-4 bg-white rounded shadow" style="width: 100%; max-width: 450px;">
         @csrf
 
-        <label for="nombre">Nombre *</label>
-        <input type="text" name="nombre" value="{{ old('nombre') }}" required>
+        <h1 class="text-center mb-4 border-bottom pb-2">Registrar Cliente</h1>
 
-        <label for="tipo_documento">Tipo de Documento *</label>
-        <select name="tipo_documento" required>
+        {{-- Mensajes --}}
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <strong>Ups!</strong> Hay errores en tus datos.
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        @if(session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+
+        {{-- Campos --}}
+        <label>Nombre *</label>
+        <input type="text" name="nombre" value="{{ old('nombre') }}" class="form-control mb-2" required>
+
+        <label>Tipo de Documento *</label>
+        <select name="tipo_documento" class="form-select mb-2" required>
             <option value="">Seleccione...</option>
             <option value="CC" {{ old('tipo_documento') == 'CC' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
             <option value="TI" {{ old('tipo_documento') == 'TI' ? 'selected' : '' }}>Tarjeta de Identidad</option>
@@ -152,27 +36,28 @@
             <option value="PASAPORTE" {{ old('tipo_documento') == 'PASAPORTE' ? 'selected' : '' }}>Pasaporte</option>
         </select>
 
-        <label for="numero_documento">Número de Documento *</label>
-        <input type="text" name="numero_documento" value="{{ old('numero_documento') }}" required>
+        <label>Número de Documento *</label>
+        <input type="text" name="numero_documento" value="{{ old('numero_documento') }}" class="form-control mb-2" required>
 
-        <label for="telefono">Teléfono</label>
-        <input type="text" name="telefono" value="{{ old('telefono') }}">
+        <label>Teléfono</label>
+        <input type="text" name="telefono" value="{{ old('telefono') }}" class="form-control mb-2">
 
-        <label for="direccion">Dirección</label>
-        <textarea name="direccion">{{ old('direccion') }}</textarea>
+        <label>Dirección</label>
+        <textarea name="direccion" class="form-control mb-2">{{ old('direccion') }}</textarea>
 
-        <label for="ciudad">Ciudad</label>
-        <input type="text" name="ciudad" value="{{ old('ciudad') }}">
+        <label>Ciudad</label>
+        <input type="text" name="ciudad" value="{{ old('ciudad') }}" class="form-control mb-2">
 
-        <label>
-            <input type="checkbox" name="frecuente" value="1" {{ old('frecuente') ? 'checked' : '' }}>
-            Cliente frecuente
-        </label>
+        <div class="form-check mb-3">
+            <input type="checkbox" name="frecuente" value="1" class="form-check-input" id="frecuente" {{ old('frecuente') ? 'checked' : '' }}>
+            <label class="form-check-label" for="frecuente">Cliente frecuente</label>
+        </div>
 
-        <div class="button-container">
-            <a href="{{ route('clientes.index') }}" class="form-button back-button">Atrás</a>
-            <button type="reset" class="form-button cancel-button">Cancelar</button>
-            <button type="submit" class="form-button save-button">Guardar</button>
+        <div class="d-flex justify-content-between">
+            <a href="{{ route('admin.clientes.index') }}" class="btn btn-secondary">Atrás</a>
+            <button type="reset" class="btn btn-danger">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar</button>
         </div>
     </form>
 @endsection
+

@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\Route;
 
 // CRUD
 
-use App\Http\Controllers\PedidoController;
-use App\Http\Controllers\ProductoController;
+//use App\Http\Controllers\PedidoController;
+//use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ClienteController;
 
 // Rutas principales
@@ -24,12 +24,12 @@ Route::get('/menu', function () {
 
 
 // Rutas para las vistas Blade de Productos (productos)
-Route::get('/productos', [ProductoController::class, 'vistaIndex'])->name('productos.index');
-Route::get('/productos/create', [ProductoController::class, 'create'])->name('productos.create');
-Route::post('/productos', [ProductoController::class, 'storeWeb'])->name('productos.store');
-Route::get('/productos/{id}/edit', [ProductoController::class, 'edit'])->name('productos.edit');
-Route::put('/productos/{id}', [ProductoController::class, 'updateWeb'])->name('productos.update');
-Route::delete('/productos/{id}', [ProductoController::class, 'destroyWeb'])->name('productos.destroy');
+//Route::get('/productos', [ProductoController::class, 'vistaIndex'])->name('productos.index');
+//Route::get('/productos/create', [ProductoController::class, 'create'])->name('productos.create');
+//Route::post('/productos', [ProductoController::class, 'storeWeb'])->name('productos.store');
+//Route::get('/productos/{id}/edit', [ProductoController::class, 'edit'])->name('productos.edit');
+//Route::put('/productos/{id}', [ProductoController::class, 'updateWeb'])->name('productos.update');
+//Route::delete('/productos/{id}', [ProductoController::class, 'destroyWeb'])->name('productos.destroy');
 
 Route::prefix('admin')->name('admin.')->group(function () {
 // Gestión de Clientes
@@ -42,7 +42,7 @@ Route::delete('/clientes/{cliente}', [ClienteController::class, 'destroy'])->nam
 });
 
 // Rutas para las vistas Blade de Pedidos (pedidos)
-Route::get('/pedidos', [PedidoController::class, 'vistaIndex'])->name('pedidos.index');
-Route::get('/pedidos/create', [PedidoController::class, 'create'])->name('pedidos.create');
-Route::post('/pedidos', [PedidoController::class, 'storeWeb'])->name('pedidos.store');
+//Route::get('/pedidos', [PedidoController::class, 'vistaIndex'])->name('pedidos.index');
+//Route::get('/pedidos/create', [PedidoController::class, 'create'])->name('pedidos.create');
+//Route::post('/pedidos', [PedidoController::class, 'storeWeb'])->name('pedidos.store');
 
