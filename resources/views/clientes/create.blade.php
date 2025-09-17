@@ -55,7 +55,6 @@
 
         <div class="d-flex justify-content-between">
             <a href="{{ route('admin.clientes.index') }}" class="btn btn-secondary">Atrás</a>
-            <button type="reset" class="btn btn-danger">Cancelar</button>
             <button type="submit" class="btn btn-primary">Guardar</button>
         </div>
     </form>
