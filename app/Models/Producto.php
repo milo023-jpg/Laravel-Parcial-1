@@ -21,7 +21,7 @@ class Producto extends Model
     // Relación: un producto aparece en muchos ítems de venta
     public function items()
     {
-        return $this->hasMany(\App\Models\VentaItem::class, 'id_producto', 'id');
+        return $this->hasMany(\App\Models\VentaItem::class, 'producto_id', 'id');
     }
 
     // Relación indirecta: ventas donde aparece este producto
@@ -30,12 +30,12 @@ class Producto extends Model
         return $this->hasManyThrough(
             \App\Models\Venta::class,       // modelo destino
             \App\Models\VentaItem::class,   // tabla intermedia
-            'id_producto',                  // FK en venta_items
+            'producto_id',                  // FK en venta_items
             'id',                           // PK en ventas
             'id',                           // PK en productos
             'id_venta'                      // FK en venta_items hacia ventas
 
-            
+
         );
     }
 

@@ -20,7 +20,7 @@
 <body>
     <nav class="navbar navbar-dark bg-dark mb-4">
         <div class="container">
-            <a href="{{ route('menu') }}" class="navbar-brand">Empanadas y Más</a>
+            <a href="{{ route('admin') }}" class="navbar-brand">Empanadas y Más</a>
         </div>
     </nav>
 

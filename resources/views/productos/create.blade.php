@@ -4,7 +4,7 @@
 <div class="container">
     <h1>Nuevo Producto</h1>
 
-    <form action="{{ route('productos.store') }}" method="POST">
+    <form action="{{ route('admin.productos.store') }}" method="POST">
         @csrf
 
         <div class="mb-3">
@@ -32,7 +32,7 @@
         </div>
 
         <button type="submit" class="btn btn-success">Guardar</button>
-        <a href="{{ route('productos.index') }}" class="btn btn-secondary">Cancelar</a>
+        <a href="{{ route('admin.productos.index') }}" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
 @endsection

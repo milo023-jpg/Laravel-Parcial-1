@@ -12,7 +12,8 @@
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
-    <a href="{{ route('productos.create') }}" class="btn btn-primary mb-3">Nuevo Producto</a>
+    <a href="{{ route('admin.productos.create') }}" class="btn btn-primary mb-3">Nuevo Producto</a>
+    
 
     <table class="table table-bordered table-striped">
         <thead>
@@ -32,8 +33,8 @@
                 <td>{{ $p->tamaño }}</td>
                 <td>${{ number_format($p->precio, 0, ',', '.') }}</td>
                 <td>
-                    <a href="{{ route('productos.edit', $p) }}" class="btn btn-sm btn-warning">Editar</a>
-                    <form action="{{ route('productos.destroy', $p) }}" method="POST" style="display:inline">
+                    <a href="{{ route('admin.productos.edit', $p) }}" class="btn btn-sm btn-warning">Editar</a>
+                    <form action="{{ route('admin.productos.destroy', $p) }}" method="POST" style="display:inline">
                         @csrf
                         @method('DELETE')
                         <button class="btn btn-sm btn-danger" onclick="return confirm('¿Seguro de eliminar este producto?')">
@@ -49,5 +50,6 @@
             @endforelse
         </tbody>
     </table>
+    <a href="{{ route('admin') }}" class="btn btn-secondary mb-3">Volver</a>
 </div>
 @endsection

@@ -7,7 +7,7 @@
         <h1 class="mb-0">Gestión de Clientes</h1>
         <div class="d-flex gap-2">
             <a href="{{ route('admin.clientes.create') }}" class="btn btn-primary">➕ Nuevo Cliente</a>
-            <a href="{{ route('menu') }}" class="btn btn-secondary">⬅️ Menú Principal</a>
+            <a href="{{ route('admin') }}" class="btn btn-secondary">⬅️ Menú Principal</a>
         </div>
     </div>
 
