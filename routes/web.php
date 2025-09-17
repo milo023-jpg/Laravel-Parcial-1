@@ -20,7 +20,6 @@ Route::get('/', function () {
 
 // Ruta del panel de administrador
 Route::prefix('admin')->name('admin.')->group(function () {
-<<<<<<< HEAD
     Route::get('/', function () {
         return view('admin');   // <-- ahora renderiza admin.blade.php
     })->name('index');
@@ -43,7 +42,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // Informe de ventas (provisional)
     Route::get('/ventas', [VentaController::class, 'index'])->name('ventas.index');
-=======
+
 // Gestión de Clientes
 Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
 Route::get('/clientes/create', [ClienteController::class, 'create'])->name('clientes.create');
@@ -61,7 +60,6 @@ Route::get('/ventas/{venta}/edit', [VentaController::class, 'edit'])->name('vent
 Route::put('/ventas/{venta}', [VentaController::class, 'update'])->name('ventas.update');
 Route::delete('/ventas/{venta}', [VentaController::class, 'destroy'])->name('ventas.destroy');
 
->>>>>>> e654e318ff18105ac4993ca96018dcb9121456d0
 });
 
 
