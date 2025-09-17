@@ -43,8 +43,3 @@ Route::delete('/clientes/{cliente}', [ClienteController::class, 'destroy'])->nam
 
 Route::get('/pos', [VentaController::class, 'create'])->name('pos');
 
-// Rutas para las vistas Blade de Pedidos (pedidos)
-//Route::get('/pedidos', [PedidoController::class, 'vistaIndex'])->name('pedidos.index');
-//Route::get('/pedidos/create', [PedidoController::class, 'create'])->name('pedidos.create');
-//Route::post('/pedidos', [PedidoController::class, 'storeWeb'])->name('pedidos.store');
-
