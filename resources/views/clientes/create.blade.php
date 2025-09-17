@@ -142,9 +142,6 @@
         <label for="nombre">Nombre *</label>
         <input type="text" name="nombre" value="{{ old('nombre') }}" required>
 
-        <label for="ciudad">Ciudad</label>
-        <input type="text" name="ciudad" value="{{ old('ciudad') }}">
-
         <label for="tipo_documento">Tipo de Documento *</label>
         <select name="tipo_documento" required>
             <option value="">Seleccione...</option>
@@ -163,6 +160,9 @@
 
         <label for="direccion">Dirección</label>
         <textarea name="direccion">{{ old('direccion') }}</textarea>
+
+        <label for="ciudad">Ciudad</label>
+        <input type="text" name="ciudad" value="{{ old('ciudad') }}">
 
         <label>
             <input type="checkbox" name="frecuente" value="1" {{ old('frecuente') ? 'checked' : '' }}>

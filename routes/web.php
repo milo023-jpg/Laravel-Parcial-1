@@ -31,14 +31,15 @@ Route::get('/productos/{id}/edit', [ProductoController::class, 'edit'])->name('p
 Route::put('/productos/{id}', [ProductoController::class, 'updateWeb'])->name('productos.update');
 Route::delete('/productos/{id}', [ProductoController::class, 'destroyWeb'])->name('productos.destroy');
 
-// Rutas para las vistas Blade de Clientes (clientes)
-Route::get('/clientes', [ClienteController::class, 'vistaIndex'])->name('clientes.index');
+Route::prefix('admin')->name('admin.')->group(function () {
+// Gestión de Clientes
+Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
 Route::get('/clientes/create', [ClienteController::class, 'create'])->name('clientes.create');
-Route::post('/clientes', [ClienteController::class, 'storeWeb'])->name('clientes.store');
-Route::get('/clientes/{id}/edit', [ClienteController::class, 'edit'])->name('clientes.edit');
-Route::put('/clientes/{id}', [ClienteController::class, 'updateWeb'])->name('clientes.update');
-Route::delete('/clientes/{id}', [ClienteController::class, 'destroyWeb'])->name('clientes.destroy');
-
+Route::post('/clientes', [ClienteController::class, 'store'])->name('clientes.store');
+Route::get('/clientes/{cliente}/edit', [ClienteController::class, 'edit'])->name('clientes.edit');
+Route::put('/clientes/{cliente}', [ClienteController::class, 'update'])->name('clientes.update');
+Route::delete('/clientes/{cliente}', [ClienteController::class, 'destroy'])->name('clientes.destroy');
+});
 
 // Rutas para las vistas Blade de Pedidos (pedidos)
 Route::get('/pedidos', [PedidoController::class, 'vistaIndex'])->name('pedidos.index');
