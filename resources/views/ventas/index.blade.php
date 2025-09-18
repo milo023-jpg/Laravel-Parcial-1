@@ -7,7 +7,7 @@
         <h1 class="mb-0">Gestión de Ventas</h1>
         <div class="d-flex gap-2">
             <a href="{{ route('admin.ventas.create') }}" class="btn btn-primary">➕ Nueva Venta</a>
-            <a href="{{ route('admin') }}" class="btn btn-secondary">⬅️ Menú Principal</a>
+            <a href="{{ route('admin.index') }}" class="btn btn-secondary">⬅️ Menú Principal</a>
         </div>
     </div>
 
