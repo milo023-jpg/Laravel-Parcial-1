@@ -162,4 +162,19 @@ class VentaController extends Controller
         $venta = Venta::with(['cliente', 'items.producto'])->findOrFail($id);
         return view('ventas.show', compact('venta'));
     }
+
+    public function devolucion($id)
+    {
+        $venta = Venta::findOrFail($id);
+
+        if ($venta->valor_total == 0) {
+            return back()->with('error', 'La venta ya fue devuelta.');
+        }
+
+        $venta->valor_total = 0;
+        $venta->save();
+
+        return back()->with('success', 'Venta marcada como devuelta.');
+    }
+
 }

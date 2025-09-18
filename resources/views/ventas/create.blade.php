@@ -5,183 +5,188 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="mb-0">Nueva Venta</h1>
-        <a href="{{ route('pos') }}" class="btn btn-secondary">Cancelar</a>
+        <div class="d-flex gap-2">
+            @if(Route::is('admin.ventas.create'))
+                <a href="{{ route('admin.ventas.index') }}" class="btn btn-secondary mb-3">Volver a Gestión de Ventas</a>
+            @endif
+        </div>
     </div>
 
-    {{-- Mensajes --}}
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-    @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show">
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-    @if($errors->any())
-        <div class="alert alert-danger">
-            <ul class="mb-0">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    
 
     <form action="{{ route('pos.venta.store') }}" method="POST" id="formVenta">
         @csrf
         
         <div class="row">
             {{-- Sección Cliente --}}
-            <div class="col-md-6">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Información del Cliente</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label for="cliente_id" class="form-label">Cliente (Opcional)</label>
-                            <div class="d-flex gap-2">
-                                <select name="cliente_id" id="cliente_id" class="form-select">
-                                    <option value="">Cliente Mostrador</option>
-                                    @foreach($clientes as $cliente)
-                                        <option value="{{ $cliente->id }}" 
-                                            {{ (old('cliente_id') == $cliente->id || session('nuevo_cliente_id') == $cliente->id) ? 'selected' : '' }}>
-                                            {{ $cliente->nombre }} - {{ $cliente->numero_documento }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNuevoCliente">
-                                    Nuevo Cliente
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Sección Descuento y Pago --}}
-            <div class="col-md-6">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Descuento y Pago</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="descuento" class="form-label">Descuento ($)</label>
-                                    <input type="number" 
-                                           name="descuento" 
-                                           id="descuento" 
-                                           class="form-control" 
-                                           value="{{ old('descuento', 0) }}"
-                                           min="0" 
-                                           step="100"
-                                           onchange="calcularTotales()">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="pago" class="form-label">Pago Recibido ($)*</label>
-                                    <input type="number" 
-                                           name="pago" 
-                                           id="pago" 
-                                           class="form-control" 
-                                           value="{{ old('pago') }}"
-                                           required 
-                                           min="0" 
-                                           step="100"
-                                           onchange="calcularTotales()">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- Sección Productos --}}
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Productos de la Venta</h5>
-            </div>
-            <div class="card-body">
-                <div id="productos-container">
-                    {{-- Primer producto --}}
-                    <div class="row mb-3 producto-row">
-                        <div class="col-md-4">
-                            <label class="form-label">Producto *</label>
-                            <select name="productos[0]" class="form-select producto-select" required onchange="calcularTotales()">
-                                <option value="">Seleccione un producto...</option>
-                                @foreach($productos as $producto)
-                                    <option value="{{ $producto->id }}" 
-                                            data-precio="{{ $producto->precio }}"
-                                            {{ old('productos.0') == $producto->id ? 'selected' : '' }}>
-                                        {{ $producto->nombre }} - ${{ number_format($producto->precio, 0, ',', '.') }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Cantidad *</label>
-                            <input type="number" name="cantidades[0]" 
-                                class="form-control cantidad-input" 
-                                min="1" value="{{ old('cantidades.0', 1) }}" 
-                                required onchange="calcularTotales()">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Subtotal</label>
-                            <input type="text" class="form-control subtotal-display" readonly>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">&nbsp;</label>
-                            <div>
-                                <button type="button" class="btn btn-danger btn-sm eliminar-producto" onclick="eliminarProducto(this)">
-                                    Eliminar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <button type="button" class="btn btn-outline-primary" onclick="agregarProducto()">
-                    Agregar Producto
-                </button>
-            </div>
-        </div>
-
-        {{-- Resumen de Totales --}}
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Resumen de la Venta</h5>
-            </div>
-            <div class="card-body">
+            <div class="col-md-8">
                 <div class="row">
-                    <div class="col-md-3">
-                        <strong>Subtotal: $<span id="subtotal">0</span></strong>
+                    
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Información del Cliente</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="d-flex gap-2">
+                                        <select name="cliente_id" id="cliente_id" class="form-select">
+                                            <option value="">Cliente Mostrador</option>
+                                            @foreach($clientes as $cliente)
+                                                <option value="{{ $cliente->id }}" 
+                                                    {{ (old('cliente_id') == $cliente->id || session('nuevo_cliente_id') == $cliente->id) ? 'selected' : '' }}>
+                                                    {{ $cliente->nombre }} - {{ $cliente->numero_documento }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNuevoCliente">
+                                            Nuevo Cliente
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-3">
-                        <strong>Descuento: $<span id="descuento-display">0</span></strong>
+    
+                    {{-- Sección Descuento y Pago --}}
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Descuento y Pago</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="descuento" class="form-label">Descuento ($)</label>
+                                            <input type="number" 
+                                                name="descuento" 
+                                                id="descuento" 
+                                                class="form-control" 
+                                                value="{{ old('descuento', 0) }}"
+                                                min="0" 
+                                                step="100"
+                                                onchange="calcularTotales()">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="pago" class="form-label">Pago Recibido ($)*</label>
+                                            <input type="number" 
+                                                name="pago" 
+                                                id="pago" 
+                                                class="form-control" 
+                                                value="{{ old('pago') }}"
+                                                required 
+                                                min="0" 
+                                                step="100"
+                                                onchange="calcularTotales()">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-3">
-                        <strong>Total: $<span id="total">0</span></strong>
+                </div>
+            
+
+                {{-- Sección Productos --}}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Productos de la Venta</h5>
                     </div>
-                    <div class="col-md-3">
-                        <strong>Cambio: $<span id="cambio">0</span></strong>
+                    <div class="card-body">
+                        <div id="productos-container">
+                            {{-- Primer producto --}}
+                            <div class="row mb-3 producto-row">
+                                <div class="col-md-4">
+                                    <label class="form-label">Producto *</label>
+                                    <select name="productos[0]" class="form-select producto-select" required onchange="calcularTotales()">
+                                        <option value="">Seleccione un producto...</option>
+                                        @foreach($productos as $producto)
+                                            <option value="{{ $producto->id }}" 
+                                                    data-precio="{{ $producto->precio }}"
+                                                    {{ old('productos.0') == $producto->id ? 'selected' : '' }}>
+                                                {{ $producto->nombre }} - ${{ number_format($producto->precio, 0, ',', '.') }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Cantidad *</label>
+                                    <input type="number" name="cantidades[0]" 
+                                        class="form-control cantidad-input" 
+                                        min="1" value="{{ old('cantidades.0', 1) }}" 
+                                        required onchange="calcularTotales()">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Subtotal</label>
+                                    <input type="text" class="form-control subtotal-display" readonly>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">&nbsp;</label>
+                                    <div>
+                                        <button type="button" class="btn btn-danger btn-sm eliminar-producto" onclick="eliminarProducto(this)">
+                                            Eliminar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="btn btn-outline-primary" onclick="agregarProducto()">
+                            Agregar Producto
+                        </button>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-success">Registrar Venta</button>
-            <a href="{{ route('pos') }}" class="btn btn-secondary">Cancelar</a>
-        </div>
+            <div class="col-md-4">
+                {{-- Mensajes --}}
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+                @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+                @if($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+                {{-- Resumen de Totales --}}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Resumen de la Venta</h5>
+                    </div>
+                    <div class="card-body">
+                        
+                            <div class="mb-2"><strong>Subtotal: $<span id="subtotal">0</span></strong></div>
+                            <div class="mb-2"><strong>Descuento: $<span id="descuento-display">0</span></strong></div>
+                            <div class="mb-2"><strong>Total: $<span id="total">0</span></strong></div>
+                            <div class="mb-2"><strong>Cambio: $<span id="cambio">0</span></strong></div>
+                        
+                    </div>
+                </div>
 
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-success">Registrar Venta</button>
+                    <a href="{{ route('pos') }}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </div>
+
+            
+        </div>
     </form>
 
 </div>

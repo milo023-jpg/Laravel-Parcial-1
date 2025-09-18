@@ -54,27 +54,29 @@
                         </div>
                     </td>
                     <td>
-                        <strong>${{ number_format($venta->subtotal, 0, ',', '.') }}</strong>
+                        <strong>
+                            ${{ number_format($venta->items->sum(function($item) {
+                                return $item->cantidad * $item->precio_unitario;
+                            }), 0, ',', '.') }}
+                        </strong>
                     </td>
-                    <td>
-                        @if($venta->descuento > 0)
-                            <span class="text-success">${{ number_format($venta->descuento, 0, ',', '.') }}</span>
-                        @else
-                            <span class="text-muted">$0</span>
-                        @endif
-                    </td>
+                    <td> @if($venta->descuento > 0) <span class="text-success">${{ number_format($venta->descuento, 0, ',', '.') }}</span> @else <span class="text-muted">$0</span> @endif </td>
                     <td>
                         <strong class="text-primary fs-5">${{ number_format($venta->valor_total, 0, ',', '.') }}</strong>
                     </td>
                     <td>{{ \Carbon\Carbon::parse($venta->fecha_venta)->format('d/m/Y H:i') }}</td>
                     <td class="text-nowrap">
-                        <a href="{{ route('admin.ventas.edit', $venta->id) }}" class="btn btn-success btn-sm">✏️ Editar</a>
-                        <form action="{{ route('admin.ventas.destroy', $venta->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Seguro que deseas eliminar esta venta?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm">🗑️ Eliminar</button>
-                        </form>
+                        @if($venta->valor_total > 0)
+                            <form action="{{ route('admin.ventas.devolucion', $venta->id) }}" method="POST" 
+                                onsubmit="return confirm('¿Seguro que deseas marcar esta venta como DEVUELTA?')">
+                                @csrf
+                                <button type="submit" class="btn btn-warning btn-sm">↩️ Devolución</button>
+                            </form>
+                        @else
+                            <span class="badge bg-secondary">Devuelta</span>
+                        @endif
                     </td>
+
                 </tr>
                 @endforeach
             </tbody>
