@@ -4,12 +4,12 @@
 <div class="container">
     <h1>Informe de Ventas</h1>
 
-    <!-- Filtros -->
-     
     <!-- Botón volver al menú -->
     <div class="mt-3">
         <a href="{{ route('admin.index') }}" class="btn btn-secondary">⬅️ Menú Principal</a>
     </div>
+
+    <!-- Filtros -->
     <form method="GET" action="{{ route('admin.reportes.ventas') }}" class="row g-3 mb-4">
         <div class="col-md-3">
             <label>Fecha inicio</label>
@@ -35,11 +35,25 @@
             <label>Ciudad</label>
             <input type="text" name="ciudad" class="form-control" value="{{ request('ciudad') }}">
         </div>
-        <div class="col-12">
+        <div class="col-12 d-flex gap-2">
             <button class="btn btn-primary">Filtrar</button>
+            <a href="{{ route('admin.reportes.ventas') }}" class="btn btn-danger">Borrar Filtros</a>
         </div>
-        
     </form>
+
+    <!-- Totales -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="alert alert-info">
+                <strong>Total ventas del día:</strong> ${{ number_format($totalDia, 2) }}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="alert alert-success">
+                <strong>Total ventas del mes:</strong> ${{ number_format($totalMes, 2) }}
+            </div>
+        </div>
+    </div>
 
     <!-- Tabla de resultados -->
     <table class="table table-bordered">
@@ -77,5 +91,53 @@
         </tbody>
     </table>
 
+    <!-- Gráfico -->
+    <div class="card mt-4">
+        <div class="card-body" style="height:350px;"> <!-- Ajuste de altura -->
+            <h5 class="card-title">Gráfico de Ventas</h5>
+            <canvas id="ventasChart"></canvas>
+        </div>
+    </div>
+
 </div>
+
+<!-- Importar Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('ventasChart').getContext('2d');
+
+    const ventas = @json($ventas);
+
+    const labels = ventas.map(v => `Venta #${v.id}`);
+    const valores = ventas.map(v => v.valor_total);
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Valor Total de la Venta',
+                data: valores,
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            maintainAspectRatio: false, // Permite ajustar el tamaño
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 3000, // Saltos de 3000 en 3000
+                        callback: function(value) {
+                            return '$' + new Intl.NumberFormat().format(value);
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
 @endsection

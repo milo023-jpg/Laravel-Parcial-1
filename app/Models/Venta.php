@@ -45,7 +45,7 @@ class Venta extends Model
             'venta_id',                     // FK en venta_items hacia ventas
             'id',                           // PK en productos
             'id',                           // PK en ventas
-            'id_producto'                   // FK en venta_items hacia productos
+            'producto_id'                   // FK en venta_items hacia productos
         );
     }
 
