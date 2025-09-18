@@ -16,8 +16,8 @@ use App\Http\Controllers\ReporteVentasController;
 
 // Rutas principales
 Route::get('/', function () {
-    return view('admin');
-    })->name('admin');
+    return redirect()->route('pos');
+});
 
 // Ruta del panel de administrador
 Route::prefix('admin')->name('admin.')->group(function () {

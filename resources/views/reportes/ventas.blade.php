@@ -8,7 +8,7 @@
      
     <!-- Botón volver al menú -->
     <div class="mt-3">
-        <a href="{{ route('admin') }}" class="btn btn-secondary">⬅️ Menú Principal</a>
+        <a href="{{ route('admin.index') }}" class="btn btn-secondary">⬅️ Menú Principal</a>
     </div>
     <form method="GET" action="{{ route('admin.reportes.ventas') }}" class="row g-3 mb-4">
         <div class="col-md-3">
