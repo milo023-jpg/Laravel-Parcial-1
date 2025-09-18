@@ -1,28 +1,18 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
-/* Route::get('/', function () {
-    return view('welcome');
-});
- */
-
-// CRUD
-
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\VentaController;
 use App\Http\Controllers\ReporteVentasController;
 
-// Rutas principales
-Route::get('/', function () {
-    return view('admin');
-    })->name('admin');
+// Ruta principal (al iniciar va al POS)
+Route::get('/', [VentaController::class, 'create'])->name('pos');
 
 // Ruta del panel de administrador
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/', function () {
-        return view('admin');   // <-- ahora renderiza admin.blade.php
+        return view('admin');
     })->name('index');
 
     // Gestión de Productos
@@ -41,34 +31,20 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::put('/clientes/{cliente}', [ClienteController::class, 'update'])->name('clientes.update');
     Route::delete('/clientes/{cliente}', [ClienteController::class, 'destroy'])->name('clientes.destroy');
 
-    // Informe de ventas (provisional)
+    // Gestión de Ventas
     Route::get('/ventas', [VentaController::class, 'index'])->name('ventas.index');
+    Route::get('/ventas/create', [VentaController::class, 'create'])->name('ventas.create');
+    Route::post('/ventas', [VentaController::class, 'storeWeb'])->name('ventas.store');
+    Route::get('/ventas/{venta}/edit', [VentaController::class, 'edit'])->name('ventas.edit');
+    Route::put('/ventas/{venta}', [VentaController::class, 'update'])->name('ventas.update');
+    Route::delete('/ventas/{venta}', [VentaController::class, 'destroy'])->name('ventas.destroy');
+    Route::post('/ventas/{venta}/devolucion', [VentaController::class, 'devolucion'])->name('ventas.devolucion');
 
-// Gestión de Clientes
-Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
-Route::get('/clientes/create', [ClienteController::class, 'create'])->name('clientes.create');
-Route::post('/clientes', [ClienteController::class, 'store'])->name('clientes.store');
-Route::get('/clientes/{cliente}/edit', [ClienteController::class, 'edit'])->name('clientes.edit');
-Route::put('/clientes/{cliente}', [ClienteController::class, 'update'])->name('clientes.update');
-Route::delete('/clientes/{cliente}', [ClienteController::class, 'destroy'])->name('clientes.destroy');
-
-// Gestión de Ventas
-Route::get('/ventas', [VentaController::class, 'index'])->name('ventas.index');
-Route::get('/ventas/create', [VentaController::class, 'create'])->name('ventas.create');
-Route::post('/ventas', [VentaController::class, 'storeWeb'])->name('ventas.store');
-Route::get('/ventas/{venta}/edit', [VentaController::class, 'edit'])->name('ventas.edit');
-Route::put('/ventas/{venta}', [VentaController::class, 'update'])->name('ventas.update');
-Route::delete('/ventas/{venta}', [VentaController::class, 'destroy'])->name('ventas.destroy');
-Route::post('/ventas/{venta}/devolucion', [VentaController::class, 'devolucion'])->name('ventas.devolucion');
-
-// Repote de ventas
-Route::get('/reportes/ventas', [ReporteVentasController::class, 'index'])->name('reportes.ventas');
+    // Reporte de ventas
+    Route::get('/reportes/ventas', [ReporteVentasController::class, 'index'])->name('reportes.ventas');
 });
 
-
-// Rutas para las vistas Blade de Punto de Venta (POS)
-// Rutas del Punto de Venta (POS) - versión simplificada
+// Rutas para POS
 Route::get('/pos', [VentaController::class, 'create'])->name('pos');
 Route::post('/pos/venta', [VentaController::class, 'store'])->name('pos.venta.store');
 Route::post('/pos/cliente', [VentaController::class, 'storeCliente'])->name('pos.cliente.store');
-
