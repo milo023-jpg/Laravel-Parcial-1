@@ -7,7 +7,7 @@
         <h1 class="mb-0">Gestión de Ventas</h1>
         <div class="d-flex gap-2">
             <a href="{{ route('admin.ventas.create') }}" class="btn btn-primary">➕ Nueva Venta</a>
-            <a href="{{ route('menu') }}" class="btn btn-secondary">⬅️ Menú Principal</a>
+            <a href="{{ route('admin') }}" class="btn btn-secondary">⬅️ Menú Principal</a>
         </div>
     </div>
 
@@ -38,10 +38,10 @@
                 @foreach($ventas as $venta)
                 <tr>
                     <td>{{ $venta->id }}</td>
-                    <td>{{ $venta->cliente->nombre }}</td>
+                    <td>{{ $venta->cliente->nombre ?? 'Cliente Mostrador' }}</td>
                     <td>
                         <div class="productos-detalle">
-                            @foreach($venta->detalles as $detalle)
+                            @foreach($venta->items as $detalle)
                                 <div class="producto-item mb-2 p-2 border rounded bg-light">
                                     <strong>{{ $detalle->producto->nombre }}</strong>
                                     <div class="text-muted small">
@@ -68,7 +68,6 @@
                     </td>
                     <td>{{ \Carbon\Carbon::parse($venta->fecha_venta)->format('d/m/Y H:i') }}</td>
                     <td class="text-nowrap">
-                        <a href="{{ route('admin.ventas.show', $venta->id) }}" class="btn btn-info btn-sm">👁️ Ver</a>
                         <a href="{{ route('admin.ventas.edit', $venta->id) }}" class="btn btn-success btn-sm">✏️ Editar</a>
                         <form action="{{ route('admin.ventas.destroy', $venta->id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Seguro que deseas eliminar esta venta?')">
                             @csrf

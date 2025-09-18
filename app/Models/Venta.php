@@ -31,7 +31,7 @@ class Venta extends Model
      */
     public function items()
     {
-        return $this->hasMany(\App\Models\VentaItem::class, 'id_venta', 'id');
+        return $this->hasMany(\App\Models\VentaItem::class, 'venta_id', 'id');
     }
 
     /**
