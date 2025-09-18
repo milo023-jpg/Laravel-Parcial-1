@@ -50,6 +50,6 @@
             @endforelse
         </tbody>
     </table>
-    <a href="{{ route('admin') }}" class="btn btn-secondary mb-3">Volver</a>
+    <a href="{{ route('admin.index') }}" class="btn btn-secondary mb-3">Volver</a>
 </div>
 @endsection
