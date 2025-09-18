@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Venta;
-use App\Models\Cliente;
-use App\Models\Producto;
 
 class ReporteVentasController extends Controller
 {
@@ -15,7 +13,7 @@ class ReporteVentasController extends Controller
         $fechaInicio = $request->input('fecha_inicio');
         $fechaFin = $request->input('fecha_fin');
         $tipoProducto = $request->input('tipo_producto');
-        $tipoCliente = $request->input('tipo_cliente'); // frecuente o no frecuente
+        $tipoCliente = $request->input('tipo_cliente'); // 1 frecuente | 0 no frecuente
         $ciudad = $request->input('ciudad');
 
         // Query base
@@ -28,18 +26,18 @@ class ReporteVentasController extends Controller
                     $q->where('tipo', $tipoProducto);
                 });
             })
-            ->when($tipoCliente, function ($query) use ($tipoCliente) {
+            ->when($tipoCliente !== null && $tipoCliente !== '', function ($query) use ($tipoCliente) {
                 $query->whereHas('cliente', function ($q) use ($tipoCliente) {
                     $q->where('frecuente', $tipoCliente);
                 });
             })
             ->when($ciudad, function ($query) use ($ciudad) {
                 $query->whereHas('cliente', function ($q) use ($ciudad) {
-                    $q->where('direccion', 'like', "%$ciudad%");
+                    $q->where('ciudad', 'like', "%$ciudad%");
                 });
             })
             ->get();
 
-        return view('admin.reportes.ventas', compact('ventas'));
+        return view('reportes.ventas', compact('ventas'));
     }
 }

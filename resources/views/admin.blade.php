@@ -98,7 +98,12 @@
             <h2>Ventas</h2>
             <p>Ver informes y registros de ventas</p>
         </a>
-        
+
+        <a href="{{ route('admin.reportes.ventas') }}" class="menu-card">
+            <h2>Reporte de Ventas</h2>
+            <p>Ver y llevar un control sobre el historial de ventas</p>
+        </a>
+
     </div>
 </body>
 </html>
