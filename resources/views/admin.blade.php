@@ -83,7 +83,7 @@
 <body>
     <h1>Empanadas y Más | Administrador</h1>
     
-    <div class="menu-container">
+     <div class="menu-container">
         <a href="{{ route('admin.productos.index') }}" class="menu-card">
             <h2>Productos</h2>
             <p>Gestionar productos del inventario</p>
@@ -98,6 +98,7 @@
             <h2>Ventas</h2>
             <p>Ver informes y registros de ventas</p>
         </a>
+        
     </div>
 </body>
 </html>

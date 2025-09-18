@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\VentaController;
+use App\Http\Controllers\ReporteVentasController;
 
 // Rutas principales
 Route::get('/', function () {
@@ -60,6 +61,8 @@ Route::get('/ventas/{venta}/edit', [VentaController::class, 'edit'])->name('vent
 Route::put('/ventas/{venta}', [VentaController::class, 'update'])->name('ventas.update');
 Route::delete('/ventas/{venta}', [VentaController::class, 'destroy'])->name('ventas.destroy');
 
+// Repote de ventas
+Route::get('/reportes/ventas', [ReporteVentasController::class, 'index'])->name('reportes.ventas');
 });
 
 
